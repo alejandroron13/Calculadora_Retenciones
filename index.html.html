@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Asistente de Retenciones SRI - Móvil</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 10px; /* Reducido para pantallas pequeñas */
+            color: #2d3748;
+        }
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: grid;
+            grid-template-columns: 1fr; /* Por defecto 1 columna para móvil */
+            gap: 15px;
+        }
+        
+        /* En pantallas grandes (Escritorio), se vuelve horizontal automáticamente */
+        @media (min-width: 850px) {
+            .app-container { 
+                grid-template-columns: 400px 1fr; 
+                gap: 25px;
+                padding: 20px;
+            }
+        }
+        
+        .col-left, .col-right {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        h2 {
+            color: #1a365d;
+            margin: 0;
+            font-size: 18px;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 6px;
+        }
+        .panel {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        .panel-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 13.5px;
+            color: #2b6cb0;
+            border-bottom: 1px solid #cbd5e0;
+            padding-bottom: 3px;
+        }
+        .form-group {
+            margin-bottom: 8px;
+        }
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        /* Optimizados para pantallas táctiles (Zonas de toque más grandes) */
+        input, select {
+            width: 100%;
+            padding: 10px 12px; /* Más alto para facilitar el toque con el dedo */
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px; /* Evita que Safari en iPhone haga zoom automático */
+            background-color: #fff;
+            -webkit-appearance: none; /* Normaliza diseño en iOS */
+        }
+        select {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M0 3l5 5 5-5z' fill='%234a5568'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 30px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+        }
+        
+        /* Contenedor para que las tablas no rompan la pantalla en celulares pequeños */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .table-res {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+            min-width: 280px; /* Asegura legibilidad */
+        }
+        .table-res th {
+            background-color: #2d3748;
+            color: white;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 12px;
+        }
+        .table-res td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+        }
+        .tr-total {
+            font-weight: bold;
+            background-color: #edf2f7;
+        }
+        .text-right { text-align: right; }
+        .badge-code {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 11.5px;
+        }
+        .netto-box {
+            margin-top: 10px;
+            background: #f0fff4;
+            border: 1px solid #c6f6d5;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            color: #22543d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <div class="col-left">
+        <h2>Asistente de Retenciones</h2>
+        
+        <div class="panel">
+            <div class="panel-title">1. Datos de la Factura</div>
+            <div class="form-group">
+                <label for="base0">Base Tarifa 0% (Exenta / No Objeto):</label>
+                <!-- inputmode="decimal" fuerza el teclado numérico con punto/coma en el celular -->
+                <input type="number" id="base0" value="0.00" step="0.01" min="0" inputmode="decimal" oninput="procesarRetencionMixta()" onclick="this.select()">
+            </div>
+            <div class="form-group" style="border-top: 1px dashed #cbd5e0; padding-top: 8px; margin-top: 10px;">
+                <label for="baseGrabada">Base Gravada (Monto con IVA):</label>
+                <input type="number" id="baseGrabada" value="0.00" step="0.01" min="0" inputmode="decimal" oninput="procesarRetencionMixta()" onclick="this.select()">
+            </div>
+            <div class="form-group">
+                <label for="tarifaIva">Tarifa de IVA de la Base Gravada:</label>
+                <select id="tarifaIva" onchange="procesarRetencionMixta()">
+                    <option value="0.15" selected>IVA 15% (General)</option>
+                    <option value="0.08">IVA 8% (Turismo)</option>
+                    <option value="0.05">IVA 5% (Construcción)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">2. Configuración Tributaria</div>
+            <div class="form-group">
+                <label for="perfilTransaccion">Tipo de Compra / Perfil:</label>
+                <select id="perfilTransaccion" onchange="procesarRetencionMixta()">
+                    <option value="bienes_sociedad">BIENES a Sociedad-P. Naturales (Cod. 312 [2%] / Cod. 725 [30%])</option>
+                    <option value="bienes_cont_especial">BIENES a Contribuyentes Especiales (Cod. 312 [2%] / Cod. N/A [0%])</option>
+                    <option value="servicios_sociedad">SERVICIOS a Sociedad-P. Naturales (Cod. 3440 [3%] / Cod. 727 [70%])</option>
+                    <option value="arriendos">ARRIENDOS (Cod. 320 [10%] / Cod. 729 [100%])</option>                    
+                    <option value="honorarios_prof">Honorarios Profesionales (Cod. 303 [10%] / Cod. 729 [100%])</option>
+                    <option value="honorarios_Soc">Honorarios Sociedades (Cod. 303A [5%] / Cod. 727 [70%])</option>
+                    <option value="bienes_rimpe_emp">BIENES RIMPE Emprendedor (Cod. 343 [1%] / Cod. 725 [30%])</option>
+                    <option value="servicios_rimpe_emp">SERVICIOS RIMPE Emprendedor (Cod. 343 [1%] / Cod. 727 [70%])</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-right">
+        <h2>3. Liquidación Detallada</h2>
+        
+        <div class="table-responsive">
+            <table class="table-res">
+                <thead>
+                    <tr>
+                        <th>Concepto</th>
+                        <th class="text-right">Base Imponible</th>
+                        <th class="text-right">IVA Generado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Subtotal Base 0%</td>
+                        <td class="text-right" id="rBase0">$0.00</td>
+                        <td class="text-right">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Subtotal Base (<span id="lblPorcIva">15%</span>)</td>
+                        <td class="text-right" id="rBaseGrabada">$0.00</td>
+                        <td class="text-right" id="rIvaGrabado">$0.00</td>
+                    </tr>
+                    <tr class="tr-total">
+                        <td>TOTALES FACTURA</td>
+                        <td class="text-right" id="rTotalBase">$0.00</td>
+                        <td class="text-right" id="rTotalIva">$0.00</td>
+                    </tr>
+                    <tr class="tr-total" style="background-color: #edf2f7; color: #1a365d;">
+                        <td>(=) TOTAL COMPROBANTE (A)</td>
+                        <td class="text-right" colspan="2" id="rTotalFactura">$0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table-res">
+                <thead>
+                    <tr style="background-color: #c53030;">
+                        <th>Retención</th>
+                        <th>Código</th>
+                        <th class="text-right">Porc.</th>
+                        <th class="text-right">Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ret. Fuente (Renta)</td>
+                        <td><span class="badge-code" id="codRenta">---</span></td>
+                        <td class="text-right" id="porcRenta">0%</td>
+                        <td class="text-right" id="valRenta" style="color: #c53030; font-weight: bold;">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Ret. IVA</td>
+                        <td><span class="badge-code" id="codIva">---</span></td>
+                        <td class="text-right" id="porcIva">0%</td>
+                        <td class="text-right" id="valIva" style="color: #c53030; font-weight: bold;">$0.00</td>
+                    </tr>
+                    <tr class="tr-total" style="background-color: #fee2e2;">
+                        <td>TOTAL RETENIDO (B)</td>
+                        <td colspan="2"></td>
+                        <td class="text-right" id="rTotalRetenido" style="color: #c53030;">$0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="netto-box">
+            VALOR NETO A PAGAR (A - B): <span id="rNetoPagar">$0.00</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const matrizReglas = {
+        bienes_sociedad:      { codRenta: "312", porcRenta: 0.02,  codIva: "725", porcIva: 0.30 },
+        bienes_cont_especial: { codRenta: "312", porcRenta: 0.02,  codIva: "N/A", porcIva: 0.00 },       
+        servicios_sociedad:   { codRenta: "3440", porcRenta: 0.03, codIva: "727", porcIva: 0.70 },
+        arriendos:            { codRenta: "320", porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },
+        honorarios_prof:      { codRenta: "303", porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },        
+        honorarios_Soc:       { codRenta: "303A", porcRenta: 0.05, codIva: "727", porcIva: 0.70 },
+        bienes_rimpe_emp:     { codRenta: "343", porcRenta: 0.01,  codIva: "725", porcIva: 0.30 },
+        servicios_rimpe_emp:  { codRenta: "343", porcRenta: 0.01,  codIva: "727", porcIva: 0.70 }
+    };
+
+    function procesarRetencionMixta() {
+        const b0 = parseFloat(document.getElementById('base0').value) || 0;
+        const bGrabada = parseFloat(document.getElementById('baseGrabada').value) || 0;
+        const factorIva = parseFloat(document.getElementById('tarifaIva').value);
+        
+        const ivaGrabado = bGrabada * factorIva;
+        const totalBase = bGrabada + b0;
+        const totalIva = ivaGrabado; 
+        const totalFactura = totalBase + totalIva;
+
+        const perfil = document.getElementById('perfilTransaccion').value;
+        const regla = matrizReglas[perfil];
+
+        const valorRetRenta = totalBase * regla.porcRenta;
+        const valorRetIva = totalIva * regla.porcIva;
+        
+        const totalRetenido = valorRetRenta + valorRetIva;
+        const netoPagar = totalFactura - totalRetenido;
+
+        document.getElementById('rBase0').innerText = f(b0);
+        document.getElementById('rBaseGrabada').innerText = f(bGrabada);
+        document.getElementById('lblPorcIva').innerText = (factorIva * 100) + "%";
+        document.getElementById('rIvaGrabado').innerText = f(ivaGrabado);
+        
+        document.getElementById('rTotalBase').innerText = f(totalBase);
+        document.getElementById('rTotalIva').innerText = f(totalIva);
+        document.getElementById('rTotalFactura').innerText = f(totalFactura);
+
+        // Render Renta
+        document.getElementById('codRenta').innerText = regla.codRenta;
+        if (regla.codRenta === "N/A") {
+            document.getElementById('porcRenta').innerText = "No Aplica";
+        } else {
+            document.getElementById('porcRenta').innerText = (parseFloat(regla.porcRenta) * 100).toFixed(0) + "%";
+        }
+        document.getElementById('valRenta').innerText = f(valorRetRenta);
+
+        // Render IVA
+        document.getElementById('codIva').innerText = regla.codIva;
+        if (regla.codIva === "N/A") {
+            document.getElementById('porcIva').innerText = "No Aplica";
+        } else {
+            document.getElementById('porcIva').innerText = (parseFloat(regla.porcIva) * 100).toFixed(0) + "%";
+        }
+        document.getElementById('valIva').innerText = f(valorRetIva);
+
+        document.getElementById('rTotalRetenido').innerText = f(totalRetenido);
+        document.getElementById('rNetoPagar').innerText = f(netoPagar);
+    }
+
+    function f(valor) {
+        return '$' + valor.toFixed(2);
+    }
+
+    window.onload = procesarRetencionMixta;
+</script>
+
+</body>
+</html>
