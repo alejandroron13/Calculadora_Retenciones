@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Asistente de Retenciones SRI - Móvil</title>
+    <title>Asistente de Retenciones SRI - Ecuador</title>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             background-color: #f4f7f6;
             margin: 0;
-            padding: 10px; /* Reducido para pantallas pequeñas */
+            padding: 10px;
             color: #2d3748;
         }
         .app-container {
@@ -20,14 +20,14 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             display: grid;
-            grid-template-columns: 1fr; /* Por defecto 1 columna para móvil */
+            grid-template-columns: 1fr;
             gap: 15px;
         }
         
-        /* En pantallas grandes (Escritorio), se vuelve horizontal automáticamente */
+        /* En pantallas grandes (Escritorio), se vuelve horizontal */
         @media (min-width: 850px) {
             .app-container { 
-                grid-template-columns: 400px 1fr; 
+                grid-template-columns: 420px 1fr; 
                 gap: 25px;
                 padding: 20px;
             }
@@ -60,7 +60,7 @@
             padding-bottom: 3px;
         }
         .form-group {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
         label {
             display: block;
@@ -69,16 +69,15 @@
             margin-bottom: 4px;
         }
         
-        /* Optimizados para pantallas táctiles (Zonas de toque más grandes) */
         input, select {
             width: 100%;
-            padding: 10px 12px; /* Más alto para facilitar el toque con el dedo */
+            padding: 10px 12px;
             border: 1px solid #cbd5e0;
             border-radius: 6px;
             box-sizing: border-box;
-            font-size: 15px; /* Evita que Safari en iPhone haga zoom automático */
+            font-size: 15px;
             background-color: #fff;
-            -webkit-appearance: none; /* Normaliza diseño en iOS */
+            -webkit-appearance: none;
         }
         select {
             background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M0 3l5 5 5-5z' fill='%234a5568'/></svg>");
@@ -92,7 +91,6 @@
             box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
         }
         
-        /* Contenedor para que las tablas no rompan la pantalla en celulares pequeños */
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -102,7 +100,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 4px;
-            min-width: 280px; /* Asegura legibilidad */
+            min-width: 280px;
         }
         .table-res th {
             background-color: #2d3748;
@@ -140,6 +138,16 @@
             font-weight: bold;
             color: #22543d;
         }
+        .alert-box {
+            padding: 8px 12px;
+            background-color: #fffaf0;
+            border: 1px solid #feebc8;
+            color: #742a2a;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-top: 8px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -147,13 +155,27 @@
 <div class="app-container">
     
     <div class="col-left">
-        <h2>Asistente de Retenciones</h2>
+        <h2>Asistente de Retenciones SRI</h2>
         
+        <!-- SECCIÓN 1: PERFIL DEL COMPRADOR -->
         <div class="panel">
-            <div class="panel-title">1. Datos de la Factura</div>
+            <div class="panel-title">1. Perfil del Comprador (Mi Empresa / Yo)</div>
+            <div class="form-group">
+                <label for="perfilComprador">¿Qué tipo de contribuyente eres?</label>
+                <select id="perfilComprador" onchange="procesarRetencionMixta()">
+                    <option value="agente_retencion" selected>Agente de Retención (Sociedad / P. Natural Obligada)</option>
+                    <option value="contribuyente_especial">Contribuyente Especial</option>
+                    <option value="rimpe_emprendedor">RIMPE Emprendedor</option>
+                    <option value="no_agente">Persona Natural / No Agente de Retención</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: DATOS DE LA FACTURA -->
+        <div class="panel">
+            <div class="panel-title">2. Datos de la Factura</div>
             <div class="form-group">
                 <label for="base0">Base Tarifa 0% (Exenta / No Objeto):</label>
-                <!-- inputmode="decimal" fuerza el teclado numérico con punto/coma en el celular -->
                 <input type="number" id="base0" value="0.00" step="0.01" min="0" inputmode="decimal" oninput="procesarRetencionMixta()" onclick="this.select()">
             </div>
             <div class="form-group" style="border-top: 1px dashed #cbd5e0; padding-top: 8px; margin-top: 10px;">
@@ -170,27 +192,30 @@
             </div>
         </div>
 
+        <!-- SECCIÓN 3: PERFIL DEL PROVEEDOR / TRANSACCIÓN -->
         <div class="panel">
-            <div class="panel-title">2. Configuración Tributaria</div>
+            <div class="panel-title">3. Concepto / Perfil del Proveedor</div>
             <div class="form-group">
-                <label for="perfilTransaccion">Tipo de Compra / Perfil:</label>
+                <label for="perfilTransaccion">Tipo de Compra / Perfil del Vendedor:</label>
                 <select id="perfilTransaccion" onchange="procesarRetencionMixta()">
-                    <option value="bienes_sociedad">BIENES a Sociedad-P. Naturales (Cod. 312 [2%] / Cod. 725 [30%])</option>
+                    <option value="bienes_sociedad">BIENES a Sociedad - P. Naturales (Cod. 312 [2%] / Cod. 725 [30%])</option>
+                    <option value="servicios_sociedad">SERVICIOS a Sociedad - P. Naturales (Cod. 3440 [3%] / Cod. 727 [70%])</option>
                     <option value="bienes_cont_especial">BIENES a Contribuyentes Especiales (Cod. 312 [2%] / Cod. 721 [10%])</option>
-		    <option value="bienes_cont_especial">SERVICIOS a Contribuyentes Especiales (Cod. 3440 [3%] / Cod. 723 [20%])</option>
-                    <option value="servicios_sociedad">SERVICIOS a Sociedad-P. Naturales (Cod. 3440 [3%] / Cod. 727 [70%])</option>
-                    <option value="arriendos">ARRIENDOS (Cod. 320 [10%] / Cod. 729 [100%])</option>                    
+                    <option value="servicios_cont_especial" selected>SERVICIOS a Contribuyentes Especiales (Cod. 3440 [3%] / Cod. 723 [20%])</option>
+                    <option value="arriendos">ARRIENDOS (Cod. 320 [10%] / Cod. 729 [100%])</option>                     
                     <option value="honorarios_prof">Honorarios Profesionales (Cod. 303 [10%] / Cod. 729 [100%])</option>
                     <option value="honorarios_Soc">Honorarios Sociedades (Cod. 303A [5%] / Cod. 727 [70%])</option>
                     <option value="bienes_rimpe_emp">BIENES RIMPE Emprendedor (Cod. 343 [1%] / Cod. 725 [30%])</option>
                     <option value="servicios_rimpe_emp">SERVICIOS RIMPE Emprendedor (Cod. 343 [1%] / Cod. 727 [70%])</option>
+                    <option value="rimpe_popular">RIMPE Negocio Popular (Cod. 332 [0%] / Sin Ret. IVA)</option>
                 </select>
             </div>
+            <div id="alertaExcepcion" class="alert-box"></div>
         </div>
     </div>
 
     <div class="col-right">
-        <h2>3. Liquidación Detallada</h2>
+        <h2>4. Liquidación Detallada</h2>
         
         <div class="table-responsive">
             <table class="table-res">
@@ -265,15 +290,16 @@
 
 <script>
     const matrizReglas = {
-        bienes_sociedad:      { codRenta: "312", porcRenta: 0.02,  codIva: "725", porcIva: 0.30 },
-        bienes_cont_especial: { codRenta: "312", porcRenta: 0.02,  codIva: "721", porcIva: 0.10 },       
+        bienes_sociedad:         { codRenta: "312",  porcRenta: 0.02,  codIva: "725", porcIva: 0.30 },
+        servicios_sociedad:      { codRenta: "3440", porcRenta: 0.03,  codIva: "727", porcIva: 0.70 },
+        bienes_cont_especial:    { codRenta: "312",  porcRenta: 0.02,  codIva: "721", porcIva: 0.10 },       
         servicios_cont_especial: { codRenta: "3440", porcRenta: 0.03,  codIva: "723", porcIva: 0.20 },
-	servicios_sociedad:   { codRenta: "3440", porcRenta: 0.03, codIva: "727", porcIva: 0.70 },
-        arriendos:            { codRenta: "320", porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },
-        honorarios_prof:      { codRenta: "303", porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },        
-        honorarios_Soc:       { codRenta: "303A", porcRenta: 0.05, codIva: "727", porcIva: 0.70 },
-        bienes_rimpe_emp:     { codRenta: "343", porcRenta: 0.01,  codIva: "725", porcIva: 0.30 },
-        servicios_rimpe_emp:  { codRenta: "343", porcRenta: 0.01,  codIva: "727", porcIva: 0.70 }
+        arriendos:               { codRenta: "320",  porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },
+        honorarios_prof:         { codRenta: "303",  porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },        
+        honorarios_Soc:          { codRenta: "303A", porcRenta: 0.05,  codIva: "727", porcIva: 0.70 },
+        bienes_rimpe_emp:        { codRenta: "343",  porcRenta: 0.01,  codIva: "725", porcIva: 0.30 },
+        servicios_rimpe_emp:     { codRenta: "343",  porcRenta: 0.01,  codIva: "727", porcIva: 0.70 },
+        rimpe_popular:           { codRenta: "332",  porcRenta: 0.00,  codIva: "N/A", porcIva: 0.00 }
     };
 
     function procesarRetencionMixta() {
@@ -286,8 +312,42 @@
         const totalIva = ivaGrabado; 
         const totalFactura = totalBase + totalIva;
 
+        const comprador = document.getElementById('perfilComprador').value;
         const perfil = document.getElementById('perfilTransaccion').value;
-        const regla = matrizReglas[perfil];
+        let regla = { ...matrizReglas[perfil] };
+
+        const alertEl = document.getElementById('alertaExcepcion');
+        alertEl.style.display = "none";
+        alertEl.innerText = "";
+
+        // LÓGICA DE EXCEPCIONES SEGÚN EL TIPO DE COMPRADOR
+        if (comprador === "no_agente") {
+            // No es agente de retención: No efectúa retención de Renta ni de IVA
+            regla.porcRenta = 0;
+            regla.porcIva = 0;
+            regla.codRenta = "N/A";
+            regla.codIva = "N/A";
+            alertEl.innerText = "Nota: Las Personas Naturales no designadas como Agentes de Retención no emiten retenciones.";
+            alertEl.style.display = "block";
+        } else if (comprador === "rimpe_emprendedor") {
+            // RIMPE Emprendedor solo retiene en casos específicos (ej. Arriendos/Honorarios/Liquidaciones)
+            if (!["arriendos", "honorarios_prof", "honorarios_Soc"].includes(perfil)) {
+                regla.porcRenta = 0;
+                regla.porcIva = 0;
+                regla.codRenta = "N/A";
+                regla.codIva = "N/A";
+                alertEl.innerText = "Nota: Los contribuyentes RIMPE Emprendedor solo retienen Renta/IVA en honorarios, arriendos o compras a no residentes.";
+                alertEl.style.display = "block";
+            }
+        } else if (comprador === "contribuyente_especial") {
+            // Contribuyente Especial que le compra a otro Contribuyente Especial no retiene IVA
+            if (["bienes_cont_especial", "servicios_cont_especial"].includes(perfil)) {
+                regla.porcIva = 0;
+                regla.codIva = "N/A";
+                alertEl.innerText = "Nota: Entre Contribuyentes Especiales no se efectúa retención de IVA (solo Renta).";
+                alertEl.style.display = "block";
+            }
+        }
 
         const valorRetRenta = totalBase * regla.porcRenta;
         const valorRetIva = totalIva * regla.porcIva;
@@ -295,6 +355,7 @@
         const totalRetenido = valorRetRenta + valorRetIva;
         const netoPagar = totalFactura - totalRetenido;
 
+        // Renderizado de totales de factura
         document.getElementById('rBase0').innerText = f(b0);
         document.getElementById('rBaseGrabada').innerText = f(bGrabada);
         document.getElementById('lblPorcIva').innerText = (factorIva * 100) + "%";
