@@ -177,6 +177,7 @@
                 <select id="perfilTransaccion" onchange="procesarRetencionMixta()">
                     <option value="bienes_sociedad">BIENES a Sociedad-P. Naturales (Cod. 312 [2%] / Cod. 725 [30%])</option>
                     <option value="bienes_cont_especial">BIENES a Contribuyentes Especiales (Cod. 312 [2%] / Cod. 721 [10%])</option>
+		    <option value="bienes_cont_especial">SERVICIOS a Contribuyentes Especiales (Cod. 3440 [3%] / Cod. 723 [20%])</option>
                     <option value="servicios_sociedad">SERVICIOS a Sociedad-P. Naturales (Cod. 3440 [3%] / Cod. 727 [70%])</option>
                     <option value="arriendos">ARRIENDOS (Cod. 320 [10%] / Cod. 729 [100%])</option>                    
                     <option value="honorarios_prof">Honorarios Profesionales (Cod. 303 [10%] / Cod. 729 [100%])</option>
@@ -266,7 +267,8 @@
     const matrizReglas = {
         bienes_sociedad:      { codRenta: "312", porcRenta: 0.02,  codIva: "725", porcIva: 0.30 },
         bienes_cont_especial: { codRenta: "312", porcRenta: 0.02,  codIva: "721", porcIva: 0.10 },       
-        servicios_sociedad:   { codRenta: "3440", porcRenta: 0.03, codIva: "727", porcIva: 0.70 },
+        servicios_cont_especial: { codRenta: "3440", porcRenta: 0.03,  codIva: "723", porcIva: 0.20 },
+	servicios_sociedad:   { codRenta: "3440", porcRenta: 0.03, codIva: "727", porcIva: 0.70 },
         arriendos:            { codRenta: "320", porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },
         honorarios_prof:      { codRenta: "303", porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },        
         honorarios_Soc:       { codRenta: "303A", porcRenta: 0.05, codIva: "727", porcIva: 0.70 },
