@@ -156,14 +156,14 @@
     <div class="col-left">
         <h2>Asistente de Retenciones SRI</h2>
         
-        <!-- SECCIÓN 1: PERFIL DEL COMPRADOR (MI TIPO DE CONTRIBUYENTE) -->
+        <!-- SECCIÓN 1: PERFIL DEL COMPRADOR (QUIEN RETIENE) -->
         <div class="panel">
-            <div class="panel-title">1. Perfil del Comprador (Quien retiene)</div>
+            <div class="panel-title">1. Perfil del Comprador (Mi Empresa / Yo)</div>
             <div class="form-group">
                 <label for="perfilComprador">¿Qué tipo de contribuyente somos?</label>
                 <select id="perfilComprador" onchange="procesarRetencionMixta()">
-                    <option value="contribuyente_especial" selected>Contribuyente Especial</option>
-                    <option value="agente_retencion">Agente de Retención (Sociedad / P. Natural)</option>
+                    <option value="agente_retencion" selected>Agente de Retención (Sociedad / P. Natural)</option>
+                    <option value="contribuyente_especial">Contribuyente Especial</option>
                     <option value="rimpe_emprendedor">RIMPE Emprendedor</option>
                     <option value="no_agente">Persona Natural (No Agente de Retención)</option>
                 </select>
@@ -197,8 +197,13 @@
             <div class="form-group">
                 <label for="perfilTransaccion">Tipo de Compra / Proveedor:</label>
                 <select id="perfilTransaccion" onchange="procesarRetencionMixta()">
-                    <option value="servicios_cont_especial" selected>SERVICIOS a Contribuyente Especial (Cod. 3440 [3%] / Cod. 723 [20% o 0%])</option>
+                    <!-- GRANDES CONTRIBUYENTES -->
+                    <option value="bienes_gran_contribuyente">BIENES a Gran Contribuyente (Cod. 312 [2%] / Cod. 721 [10%])</option>
+                    <option value="servicios_gran_contribuyente" selected>SERVICIOS a Gran Contribuyente (Cod. 3440 [3%] / Cod. 723 [20%])</option>
+                    <!-- CONTRIBUYENTES ESPECIALES -->
                     <option value="bienes_cont_especial">BIENES a Contribuyente Especial (Cod. 312 [2%] / Cod. 721 [10% o 0%])</option>
+                    <option value="servicios_cont_especial">SERVICIOS a Contribuyente Especial (Cod. 3440 [3%] / Cod. 723 [20% o 0%])</option>
+                    <!-- OTROS CONTRIBUYENTES -->
                     <option value="bienes_sociedad">BIENES a Sociedades / P. Naturales (Cod. 312 [2%] / Cod. 725 [30%])</option>
                     <option value="servicios_sociedad">SERVICIOS a Sociedades / P. Naturales (Cod. 3440 [3%] / Cod. 727 [70%])</option>
                     <option value="arriendos">ARRIENDOS (Cod. 320 [10%] / Cod. 729 [100%])</option>                     
@@ -288,18 +293,24 @@
 </div>
 
 <script>
-    // Reglas estándar según catálogo base del SRI
     const matrizReglas = {
-        bienes_sociedad:         { codRenta: "312",  porcRenta: 0.02,  codIva: "725", porcIva: 0.30 },
-        servicios_sociedad:      { codRenta: "3440", porcRenta: 0.03,  codIva: "727", porcIva: 0.70 },
-        bienes_cont_especial:    { codRenta: "312",  porcRenta: 0.02,  codIva: "721", porcIva: 0.10 },       
-        servicios_cont_especial: { codRenta: "3440", porcRenta: 0.03,  codIva: "723", porcIva: 0.20 },
-        arriendos:               { codRenta: "320",  porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },
-        honorarios_prof:         { codRenta: "303",  porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },        
-        honorarios_Soc:          { codRenta: "303A", porcRenta: 0.05,  codIva: "727", porcIva: 0.70 },
-        bienes_rimpe_emp:        { codRenta: "343",  porcRenta: 0.01,  codIva: "725", porcIva: 0.30 },
-        servicios_rimpe_emp:     { codRenta: "343",  porcRenta: 0.01,  codIva: "727", porcIva: 0.70 },
-        rimpe_popular:           { codRenta: "332",  porcRenta: 0.00,  codIva: "N/A", porcIva: 0.00 }
+        // GRANDES CONTRIBUYENTES
+        bienes_gran_contribuyente:    { codRenta: "312",  porcRenta: 0.02,  codIva: "721", porcIva: 0.10 },
+        servicios_gran_contribuyente: { codRenta: "3440", porcRenta: 0.03,  codIva: "723", porcIva: 0.20 },
+        
+        // CONTRIBUYENTES ESPECIALES
+        bienes_cont_especial:         { codRenta: "312",  porcRenta: 0.02,  codIva: "721", porcIva: 0.10 },       
+        servicios_cont_especial:      { codRenta: "3440", porcRenta: 0.03,  codIva: "723", porcIva: 0.20 },
+        
+        // OTROS
+        bienes_sociedad:              { codRenta: "312",  porcRenta: 0.02,  codIva: "725", porcIva: 0.30 },
+        servicios_sociedad:           { codRenta: "3440", porcRenta: 0.03,  codIva: "727", porcIva: 0.70 },
+        arriendos:                    { codRenta: "320",  porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },
+        honorarios_prof:              { codRenta: "303",  porcRenta: 0.10,  codIva: "729", porcIva: 1.00 },        
+        honorarios_Soc:               { codRenta: "303A", porcRenta: 0.05,  codIva: "727", porcIva: 0.70 },
+        bienes_rimpe_emp:             { codRenta: "343",  porcRenta: 0.01,  codIva: "725", porcIva: 0.30 },
+        servicios_rimpe_emp:          { codRenta: "343",  porcRenta: 0.01,  codIva: "727", porcIva: 0.70 },
+        rimpe_popular:                { codRenta: "332",  porcRenta: 0.00,  codIva: "N/A", porcIva: 0.00 }
     };
 
     function procesarRetencionMixta() {
@@ -320,36 +331,51 @@
         alertEl.style.display = "none";
         alertEl.innerText = "";
 
-        // EVALUACIÓN DE LAS REGLAS DE RETENCIÓN DE IVA SEGÚN COMPRADOR Y PROVEEDOR
-        if (comprador === "contribuyente_especial") {
-            if (perfil === "servicios_cont_especial") {
-                regla.porcIva = 0.20; // 20% IVA entre Contribuyentes Especiales
-                regla.codIva = "723";
-                alertEl.innerText = "Operación Entre Contribuyentes Especiales: Se aplica retención de IVA del 20% en Servicios (Cod. 723).";
-                alertEl.style.display = "block";
-            } else if (perfil === "bienes_cont_especial") {
-                regla.porcIva = 0.10; // 10% IVA entre Contribuyentes Especiales
-                regla.codIva = "721";
-                alertEl.innerText = "Operación Entre Contribuyentes Especiales: Se aplica retención de IVA del 10% en Bienes (Cod. 721).";
+        // LÓGICA SEGÚN COMPRADOR Y PROVEEDOR
+
+        // 1. COMPRAS A GRANDES CONTRIBUYENTES
+        if (["bienes_gran_contribuyente", "servicios_gran_contribuyente"].includes(perfil)) {
+            if (comprador === "agente_retencion" || comprador === "contribuyente_especial") {
+                if (perfil === "bienes_gran_contribuyente") {
+                    regla.porcIva = 0.10; // 10% IVA en Bienes (Cód. 721)
+                    regla.codIva = "721";
+                } else {
+                    regla.porcIva = 0.20; // 20% IVA en Servicios (Cód. 723)
+                    regla.codIva = "723";
+                }
+                alertEl.innerText = "Compras a Grandes Contribuyentes: Aplica retención del " + (regla.porcIva * 100) + "% de IVA (Cód. " + regla.codIva + ").";
                 alertEl.style.display = "block";
             }
-        } else {
-            // Si el comprador NO es Contribuyente Especial (es Agente de Retención Común) y le compra a un Contribuyente Especial
-            if (["bienes_cont_especial", "servicios_cont_especial"].includes(perfil)) {
+        } 
+        // 2. COMPRAS A CONTRIBUYENTES ESPECIALES (NO GRANDES)
+        else if (["bienes_cont_especial", "servicios_cont_especial"].includes(perfil)) {
+            if (comprador === "contribuyente_especial") {
+                // Entre Contribuyentes Especiales se retiene el 10% o 20%
+                if (perfil === "bienes_cont_especial") {
+                    regla.porcIva = 0.10;
+                    regla.codIva = "721";
+                } else {
+                    regla.porcIva = 0.20;
+                    regla.codIva = "723";
+                }
+                alertEl.innerText = "Operación Entre Contribuyentes Especiales: Se retiene el " + (regla.porcIva * 100) + "% de IVA.";
+                alertEl.style.display = "block";
+            } else if (comprador === "agente_retencion") {
+                // Agente común comprando a Contribuyente Especial no retiene IVA
                 regla.porcIva = 0.00;
                 regla.codIva = "N/A";
-                alertEl.innerText = "Nota: Como NO eres Contribuyente Especial, no retienes IVA al comprarle a un Contribuyente Especial (Retención IVA: 0%).";
+                alertEl.innerText = "Nota: Como Agente de Retención Común, no retienes IVA a Contribuyentes Especiales (solo Renta).";
                 alertEl.style.display = "block";
             }
         }
 
-        // Si el comprador no es agente de retención en absoluto
+        // 3. EXCEPCIONES PARA COMPRADORES ESPECIALES
         if (comprador === "no_agente") {
             regla.porcRenta = 0;
             regla.porcIva = 0;
             regla.codRenta = "N/A";
             regla.codIva = "N/A";
-            alertEl.innerText = "Nota: Las Personas Naturales no designadas como Agentes de Retención no emiten retenciones.";
+            alertEl.innerText = "Nota: Las Personas Naturales (No Agentes de Retención) no emiten retenciones.";
             alertEl.style.display = "block";
         } else if (comprador === "rimpe_emprendedor") {
             if (!["arriendos", "honorarios_prof", "honorarios_Soc"].includes(perfil)) {
@@ -357,18 +383,18 @@
                 regla.porcIva = 0;
                 regla.codRenta = "N/A";
                 regla.codIva = "N/A";
-                alertEl.innerText = "Nota: RIMPE Emprendedor solo retiene Renta/IVA en honorarios, arriendos o importaciones.";
+                alertEl.innerText = "Nota: El régimen RIMPE Emprendedor solo retiene Renta e IVA en honorarios, arriendos o importaciones.";
                 alertEl.style.display = "block";
             }
         }
 
-        // Cálculo numérico
+        // Cálculos numéricos
         const valorRetRenta = totalBase * regla.porcRenta;
         const valorRetIva = totalIva * regla.porcIva;
         const totalRetenido = valorRetRenta + valorRetIva;
         const netoPagar = totalFactura - totalRetenido;
 
-        // Renderizado
+        // Renderizado en pantalla
         document.getElementById('rBase0').innerText = f(b0);
         document.getElementById('rBaseGrabada').innerText = f(bGrabada);
         document.getElementById('lblPorcIva').innerText = (factorIva * 100) + "%";
